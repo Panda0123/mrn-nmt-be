@@ -17,6 +17,7 @@ numpy==2.2.4
 packaging==24.2
 pydantic>=2.5.0
 pydantic-core==2.27.2
+python-dotenv>=1.0.0
 pyyaml==6.0.2
 regex==2024.11.6
 requests>=2.31.0
