@@ -16,6 +16,7 @@ A FastAPI-based RESTful API for translating between Maranao and English language
 - Uvicorn
 - Transformers
 - PyTorch
+- python-dotenv
 - Finetuned T5 model for Maranao-English translation
 
 ## Installation
@@ -34,6 +35,9 @@ A FastAPI-based RESTful API for translating between Maranao and English language
    - Download the finetuned [model](https://drive.google.com/file/d/1ZQcOaMBqrAbUMwvwqawJ53ndKInXlVlX/view)
    - Unzip the downloaded file
    - Place the extracted model files in the `./models` directory
+4. Set up authentication:
+   - Create a `.env` file based on the `.env.example`
+   - Add your secret API key: `API_KEY=your_secure_api_key_here`
 
 ## Running the API
 
@@ -57,11 +61,24 @@ Once the server is running, you can access the interactive API documentation at:
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
+## Authentication
+
+All translation requests require authentication using an API key.
+
+- Add the API key to the request headers as `X-API-Key`
+- The API key must match the one specified in your `.env` file
+
 ## API Endpoints
 
 ### POST /translate
 
 Translates text between Maranao and English.
+
+#### Request Headers
+
+```
+X-API-Key: your_api_key_here
+```
 
 #### Request Body
 
@@ -92,6 +109,7 @@ Translates text between Maranao and English.
 curl -X 'POST' \
   'http://localhost:8000/translate' \
   -H 'Content-Type: application/json' \
+  -H 'X-API-Key: your_api_key_here' \
   -d '{
   "source_lang": "MARANAO",
   "target_lang": "ENGLISH",
@@ -105,13 +123,16 @@ curl -X 'POST' \
 import requests
 
 url = "http://localhost:8000/translate"
+headers = {
+    "X-API-Key": "your_api_key_here"
+}
 payload = {
     "source_lang": "MARANAO",
     "target_lang": "ENGLISH",
     "source_text": "Anda ka song?"
 }
 
-response = requests.post(url, json=payload)
+response = requests.post(url, json=payload, headers=headers)
 print(response.json())
 ```
 
@@ -120,11 +141,14 @@ print(response.json())
 The API returns appropriate HTTP status codes:
 
 - 400: Bad Request (invalid parameters)
+- 401: Unauthorized (missing API key)
+- 403: Forbidden (invalid API key)
 - 500: Server Error (translation failure)
 
 Each error response includes a detail message explaining the issue.
 
+## TODOs
 
-### TODOs
-
-- Add Auth
+- Add support for batch translation
+- Implement rate limiting
+- Add translation memory for frequently translated phrases
