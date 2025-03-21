@@ -1,8 +1,14 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Security, Depends, Header
 from pydantic import BaseModel
 from transformers import T5ForConditionalGeneration, T5Tokenizer
-from typing import Literal
+from typing import Literal, Optional
 import uvicorn
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+API_KEY = os.getenv("API_KEY", "default_key_for_development")
 
 # Initialize the FastAPI app
 app = FastAPI(
@@ -19,6 +25,24 @@ class TranslationRequest(BaseModel):
 
 class TranslationResponse(TranslationRequest):
     target_text: str
+
+# Authentication dependency
+async def verify_api_key(x_api_key: Optional[str] = Header(None)):
+    if not x_api_key:
+        raise HTTPException(
+            status_code=401,
+            detail="API Key is missing. Please provide 'X-API-Key' header.",
+            headers={"WWW-Authenticate": "API-Key"},
+        )
+    
+    if x_api_key != API_KEY:
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid API Key",
+            headers={"WWW-Authenticate": "API-Key"},
+        )
+    
+    return x_api_key
 
 # Load the models (this happens only once when the server starts)
 try:
@@ -37,7 +61,10 @@ def translate(model, tokenizer, src: str):
     return decoded[6:-4]  # remove sos and eos
 
 @app.post("/translate", response_model=TranslationResponse)
-async def translate_text(request: TranslationRequest):
+async def translate_text(
+    request: TranslationRequest,
+    api_key: str = Depends(verify_api_key)
+):
     # Validate that source and target languages are different
     if request.source_lang == request.target_lang:
         raise HTTPException(
@@ -81,7 +108,8 @@ async def translate_text(request: TranslationRequest):
 async def root():
     return {
         "message": "Welcome to the Maranao-English Translation API",
-        "usage": "POST to /translate with JSON body containing source_lang, target_lang, and source_text"
+        "usage": "POST to /translate with JSON body containing source_lang, target_lang, and source_text",
+        "authentication": "API Key required in X-API-Key header"
     }
 
 # Run the server directly if this file is executed
