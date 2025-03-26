@@ -1,0 +1,39 @@
+# Version control
+.git
+.gitignore
+
+# Python virtual environments
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+
+# Development files
+.python-version
+request.http
+test_api.py
+
+# Logs
+*.log
+
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Do NOT ignore models directory since it's needed for inference
+# MRN_NMT.zip can be ignored since we already have the extracted models
+MRN_NMT.zip 
