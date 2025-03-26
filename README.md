@@ -41,6 +41,8 @@ A FastAPI-based RESTful API for translating between Maranao and English language
 
 ## Running the API
 
+### Standard Method
+
 Start the server with:
 
 ```
@@ -54,6 +56,34 @@ uvicorn app:app --reload
 ```
 
 The server will start at http://0.0.0.0:8000 by default.
+
+### Using Docker
+
+This project can be run using Docker:
+
+1. Make sure you have Docker and Docker Compose installed
+2. Build and start the container:
+   ```
+   docker-compose up -d
+   ```
+3. To stop the container:
+   ```
+   docker-compose down
+   ```
+
+Alternatively, you can use Docker without Docker Compose:
+
+```
+# Build the Docker image
+docker build -t maranao-nmt-api .
+
+# Run the container
+docker run -p 8000:8000 --env-file .env -v $(pwd)/models:/app/models maranao-nmt-api
+```
+
+### Accessing the API
+
+The API will be available at http://localhost:8000.
 
 ## API Documentation
 
@@ -152,3 +182,5 @@ Each error response includes a detail message explaining the issue.
 - Add support for batch translation
 - Implement rate limiting
 - Add translation memory for frequently translated phrases
+- Add health check endpoint
+- Implement CI/CD pipeline for Docker image deployment

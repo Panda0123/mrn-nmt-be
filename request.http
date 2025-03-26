@@ -1,0 +1,24 @@
+### Home
+GET http://localhost:8000/
+
+### Translate Maranao to English
+POST http://localhost:8000/translate
+content-type: application/json
+x-api-key: maranao_translation_dev_key
+
+{
+  "source_lang": "MARANAO",
+  "target_lang": "ENGLISH",
+  "source_text": "Anda ka song?"
+}
+
+### Translate English to Maranao
+POST http://localhost:8000/translate
+content-type: application/json
+x-api-key: maranao_translation_dev_key
+
+{
+  "source_lang": "ENGLISH",
+  "target_lang": "MARANAO",
+  "source_text": "Where are you going?"
+}
